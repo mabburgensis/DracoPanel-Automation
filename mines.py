@@ -1,3 +1,4 @@
+print("=== mines.py BAŞLADI ===")
 import time, random
 import sys
 from selenium.webdriver.common.by import By
@@ -211,4 +212,3 @@ def test_mines_flow():
 
 if __name__ == "__main__":
     test_mines_flow()
-    sys.exit(0)
