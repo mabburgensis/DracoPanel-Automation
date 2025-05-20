@@ -15,11 +15,18 @@ def open_login_modal(driver, wait):
     screenshot(driver, "login_modal_opened")
 
 
-def get_login_elements(driver):
-    username = driver.find_element(By.XPATH, LoginLocators.USERNAME_INPUT)
-    password = driver.find_element(By.XPATH, LoginLocators.PASSWORD_INPUT)
-    submit = driver.find_element(By.XPATH, LoginLocators.SUBMIT_BUTTON)
-    return username, password, submit
+def open_login_modal(driver, wait):
+    wait = WebDriverWait(driver, 20)
+    try:
+        login_btn = wait.until(
+            EC.element_to_be_clickable((By.XPATH, LoginLocators.LOGIN_BUTTON_HEADER))
+        )
+        driver.save_screenshot("login_btn_found.png")
+        login_btn.click()
+    except Exception as e:
+        driver.save_screenshot("login_btn_NOT_found.png")
+        print("Login butonu bulunamadı veya tıklanamadı:", e)
+        raise
 
 
 def test_login_flow():
