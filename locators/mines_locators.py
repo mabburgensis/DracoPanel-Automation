@@ -2,7 +2,7 @@
 
 class MinesLocators:
     # Oyuna giriş için banner
-    MINES_BANNER = '//*[@id="root"]/main/div/div[2]/div/div[2]/a[7]/img'
+    MINES_BANNER = '//*[@id="root"]/main/div/div[2]/div/div[2]/a[5]/img'
 
     # Manuel mod inputları
     BET_AMOUNT_INPUT = '//*[@id="root"]/div/aside/section/section/div[1]/div[2]/div/input'
