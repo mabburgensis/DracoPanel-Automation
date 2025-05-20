@@ -24,9 +24,7 @@ def run_test(file_name):
 if __name__ == "__main__":
     print("=== 🧪 Otomasyon Test Başlatıcısı (main.py) ===")
     for test_file in TEST_FILES:
-        print(f"DEBUG | Sıradaki dosya: {test_file}")  # <--- BURAYA EKLE
         if os.path.exists(test_file):
-            print(f"DEBUG | {test_file} bulundu, run_test çağrılacak")  # <--- BURAYA EKLE
             run_test(test_file)
         else:
             print(f"⚠️ Dosya bulunamadı: {test_file}")
