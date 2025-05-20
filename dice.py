@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
-from common.browser_utils import open_browser, screenshot
+from common.browser_utils import open_browser
 from common.user_data import load_user_data
 from locators.login_locators import LoginLocators
 from locators.dice_locators import DiceLocators
@@ -35,7 +35,7 @@ def login_and_open_dice(driver, wait):
     creds = load_user_data()
     wait.until(EC.visibility_of_element_located((By.XPATH, LoginLocators.USERNAME_INPUT))).send_keys(creds["username"])
     driver.find_element(By.XPATH, LoginLocators.PASSWORD_INPUT).send_keys(creds["password"])
-    driver.find_element(By.XPATH, LoginLocators.SUBMIT_BUTTON).click()
+    driver.find_element(By.XPATH, LoginLocators.LOGIN_SUBMIT_BUTTON).click()
     wait.until(EC.presence_of_element_located((By.XPATH, LoginLocators.LOGOUT_BUTTON)))
     print("✅ Login başarılı")
     time.sleep(1.2)
@@ -64,7 +64,7 @@ def login_and_open_dice(driver, wait):
                 time.sleep(0.7)
         else:
             time.sleep(0.5)
-    screenshot(driver, "dice_game_opened")
+    # screenshot(driver, "dice_game_opened")
 
 def read_results_with_wait(driver, wait, timeout=5):
     # Sonuçlar geç oluşabilir, 5 saniye boyunca aralıklı dene

@@ -2,8 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
-
-from common.browser_utils import open_browser, screenshot
+from common.browser_utils import open_browser
 from locators.register_locators import RegisterLocators
 from common import user_data  # ✅ JSON dosyasına veri kaydı için
 
@@ -14,7 +13,7 @@ def open_register_modal(driver, wait):
     ))
     register_btn.click()
     wait.until(EC.presence_of_element_located((By.XPATH, RegisterLocators.EMAIL_INPUT)))
-    screenshot(driver, "register_modal_opened")
+    # screenshot(driver, "register_modal_opened")
 
 
 def get_form_elements(driver):
@@ -29,10 +28,10 @@ def print_error(driver, xpath, label, ss_name):
     try:
         error = driver.find_element(By.XPATH, xpath)
         print(f"❌ {label}: {error.text}")
-        screenshot(driver, ss_name)
+        # screenshot(driver, ss_name)
     except:
         print(f"✅ {label}: Hata mesajı görünmedi")
-        screenshot(driver, ss_name + "_noerror")
+        # screenshot(driver, ss_name + "_noerror")
 
 
 def test_registration_flow():
@@ -72,7 +71,7 @@ def test_registration_flow():
     username.send_keys(valid_username)
     password.send_keys(password_val)
 
-    screenshot(driver, "r03_before_submit")
+    # screenshot(driver, "r03_before_submit")
     submit.click()
     print(f"\n✅ R-03: Başarılı kayıt deneniyor... ({valid_email}, {valid_username})")
 
@@ -81,13 +80,13 @@ def test_registration_flow():
             (By.XPATH, RegisterLocators.REGISTER_MODAL_FORM)
         ))
         print("🟢 R-03: Kayıt başarıyla tamamlandı.")
-        screenshot(driver, "r03_success")
+        # screenshot(driver, "r03_success")
     except:
         print("🔴 R-03: Kayıt başarısız gibi görünüyor (modal kapanmadı).")
-        screenshot(driver, "r03_failure")
+        # screenshot(driver, "r03_failure")
 
     time.sleep(5)
-    screenshot(driver, "r03_after_submit")
+    # screenshot(driver, "r03_after_submit")
     driver.quit()  # Şimdilik kapalı
 
 

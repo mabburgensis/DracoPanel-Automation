@@ -2,9 +2,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from common.browser_utils import open_browser
 import time
-
-from common.browser_utils import open_browser, screenshot
 from common.user_data import load_user_data
 from locators.login_locators import LoginLocators
 
@@ -20,7 +19,7 @@ def open_login_modal(driver, wait):
     login_btn.click()
     wait.until(EC.presence_of_element_located((By.XPATH, LoginLocators.USERNAME_INPUT)))
     time.sleep(1)
-    screenshot(driver, "login_modal_opened")
+    # # screenshot(driver, "login_modal_opened")  # KALDIRILDI
 
 def test_login_flow():
     driver, wait = open_browser()
@@ -44,7 +43,7 @@ def test_login_flow():
         print(f"✅ Parola boş: {error2.text}")
     except:
         print("✅ Parola boş: Hata mesajı görünmedi")
-    screenshot(driver, "l01_empty_fields")
+    # # screenshot(driver, "l01_empty_fields")  # KALDIRILDI
     time.sleep(1)
 
     # L-02: Geçersiz kullanıcı adı
@@ -55,7 +54,7 @@ def test_login_flow():
     submit_btn.click()
     print("L-02: Geçersiz kullanıcı adı gönderildi")
     time.sleep(2)
-    screenshot(driver, "l02_invalid_username")
+    # # screenshot(driver, "l02_invalid_username")  # KALDIRILDI
 
     # L-03: Geçersiz şifre
     username_el.clear()
@@ -75,7 +74,7 @@ def test_login_flow():
     submit_btn.click()
     print("L-03: Geçersiz şifre gönderildi")
     time.sleep(2)
-    screenshot(driver, "l03_invalid_password")
+    # # screenshot(driver, "l03_invalid_password")  # KALDIRILDI
 
     # L-04: Başarılı login
     time.sleep(1)
@@ -92,7 +91,7 @@ def test_login_flow():
     time.sleep(0.7)
     password_el.send_keys(valid_password)
     time.sleep(0.7)
-    screenshot(driver, "l04_before_login")
+    # # screenshot(driver, "l04_before_login")  # KALDIRILDI
     submit_btn.click()
     time.sleep(2)
 
@@ -101,10 +100,10 @@ def test_login_flow():
     try:
         wait.until(EC.element_to_be_clickable((By.XPATH, LoginLocators.LOGOUT_BUTTON)))
         print("🟢 L-04: Giriş başarılı!")
-        screenshot(driver, "l04_login_success")
+        # # screenshot(driver, "l04_login_success")  # KALDIRILDI
     except:
         print("🔴 L-04: Giriş başarısız gibi görünüyor")
-        screenshot(driver, "l04_login_failure")
+        # # screenshot(driver, "l04_login_failure")  # KALDIRILDI
     time.sleep(1)
 
     # L-05: Logout ve tekrar login
@@ -113,7 +112,7 @@ def test_login_flow():
     time.sleep(1.5)
     wait.until(EC.presence_of_element_located((By.XPATH, LoginLocators.LOGIN_BUTTON_AFTER_LOGOUT)))
     print("🔄 Logout işlemi başarılı, tekrar giriş deneniyor...")
-    screenshot(driver, "l05_after_logout")
+    # # screenshot(driver, "l05_after_logout")  # KALDIRILDI
     time.sleep(1)
 
     open_login_modal(driver, wait)
@@ -134,13 +133,12 @@ def test_login_flow():
     try:
         wait.until(EC.element_to_be_clickable((By.XPATH, LoginLocators.LOGOUT_BUTTON)))
         print("🟢 L-05: Tekrar giriş başarılı.")
-        screenshot(driver, "l05_relogin_success")
+        # # screenshot(driver, "l05_relogin_success")  # KALDIRILDI
     except:
         print("🔴 L-05: Tekrar giriş başarısız.")
-        screenshot(driver, "l05_relogin_failure")
+        # # screenshot(driver, "l05_relogin_failure")  # KALDIRILDI
 
     driver.quit()
-
 
 if __name__ == "__main__":
     test_login_flow()

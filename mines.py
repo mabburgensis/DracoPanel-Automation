@@ -5,7 +5,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 
-from common.browser_utils import open_browser, screenshot
+from common.browser_utils import open_browser
 from common.user_data import load_user_data
 from locators.login_locators import LoginLocators
 from locators.mines_locators import MinesLocators
@@ -42,7 +42,7 @@ def login_and_open_mines(driver, wait):
     wait.until(EC.visibility_of_element_located((By.XPATH, LoginLocators.USERNAME_INPUT)))\
         .send_keys(creds["username"])
     driver.find_element(By.XPATH, LoginLocators.PASSWORD_INPUT).send_keys(creds["password"])
-    driver.find_element(By.XPATH, LoginLocators.SUBMIT_BUTTON).click()
+    driver.find_element(By.XPATH, LoginLocators.LOGIN_SUBMIT_BUTTON).click()
     wait.until(EC.presence_of_element_located((By.XPATH, LoginLocators.LOGOUT_BUTTON)))
 
     # Mines banner
@@ -57,7 +57,7 @@ def login_and_open_mines(driver, wait):
     real = wait.until(EC.element_to_be_clickable((By.XPATH, MinesLocators.REAL_PLAY_BUTTON)))
     real.click()
     time.sleep(3)
-    screenshot(driver, "mines_game_opened")
+    ## screenshot(driver, "mines_game_opened")
 
 def test_place_random_bet(driver, wait):
     for _ in range(3):
@@ -98,7 +98,7 @@ def test_place_random_bet(driver, wait):
         EC.element_to_be_clickable((By.XPATH, MinesLocators.PLACE_BET_BUTTON))
     ).click()
     print("   ✅ Bahis gönderildi")
-    screenshot(driver, "m01_bet_sent")
+    # screenshot(driver, "m01_bet_sent")
     time.sleep(2)
     return True
 
@@ -124,7 +124,7 @@ def play_until_first_win(driver, wait):
         print("▶️ İlk pick tıklanıyor…")
         pick1.click()
         time.sleep(2)
-        screenshot(driver, "after_first_pick")
+        # screenshot(driver, "after_first_pick")
         after1 = read_diamond_count(driver)
         if after1 is None or after1 >= (before or 0):
             print("💥 İlk pick MINE, yeniden başla")
@@ -147,7 +147,7 @@ def play_until_first_win(driver, wait):
         print("▶️ İkinci pick tıklanıyor…")
         pick2.click()
         time.sleep(2)
-        screenshot(driver, "after_second_pick")
+        # screenshot(driver, "after_second_pick")
         after2 = read_diamond_count(driver)
         if after2 is None or after2 >= before2:
             print("💥 İkinci pick MINE, yeniden başla")
@@ -169,7 +169,7 @@ def play_until_first_win(driver, wait):
             print(f"   🏆 {popup.text}")
         except TimeoutException:
             print("   ⚠️ Popup yok, yine de başarılı sayılıyor")
-        screenshot(driver, "final_win_collected")
+        # screenshot(driver, "final_win_collected")
         print("🎉 İlk kazanç alındı, test sonlandırıldı!")
         break
 
