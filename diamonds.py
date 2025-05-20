@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, StaleElementReferenceException, ElementNotInteractableException
 
 from common.browser_utils import open_browser, screenshot
 from common.user_data import load_user_data
@@ -51,8 +51,8 @@ def login_and_open_diamonds(driver, wait):
     print("▶️ Real Play’e tıklanıyor...")
     real = wait.until(EC.element_to_be_clickable((By.XPATH, DiamondsLocators.REAL_PLAY_BUTTON)))
     real.click()
+    time.sleep(3.0)
 
-    # --- Sleep yerine: Bahis inputu görünene kadar profesyonel bekleme! ---
     print("⌛ Oyun yükleniyor, bahis inputu bekleniyor...")
     for _ in range(20):
         if switch_to_game_iframe(driver):
@@ -66,31 +66,48 @@ def login_and_open_diamonds(driver, wait):
             time.sleep(0.5)
     screenshot(driver, "diamonds_game_opened")
 
+def safe_input_and_click(driver, wait, input_xpath, value, button_xpath, retries=3):
+    """
+    Stale element ve benzeri hatalarda otomatik retry yapar.
+    """
+    for attempt in range(retries):
+        try:
+            if not switch_to_game_iframe(driver):
+                time.sleep(0.7)
+                continue
+            bet_input = wait.until(EC.element_to_be_clickable((By.XPATH, input_xpath)))
+            bet_input.click()
+            time.sleep(0.3)
+            bet_input.clear()
+            time.sleep(0.15)
+            slow_type(bet_input, str(value), delay=0.13)
+            time.sleep(0.6)
+            submit_btn = wait.until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
+            submit_btn.click()
+            return True
+        except (StaleElementReferenceException, ElementNotInteractableException, TimeoutException) as e:
+            print(f"   🔄 Retry ({attempt+1}) due to: {e}")
+            time.sleep(1.2)
+    print("   ❌ Bahis input ya da butonuna ulaşılamadı (stabilizasyon hatası)!")
+    return False
+
 def play_10_bets(driver, wait):
     print("🎲 10 defa random bahis oynanacak…")
     for bet_num in range(1, 11):
         try:
-            if not switch_to_game_iframe(driver):
-                print("   ❌ Oyun iframe bulunamadı!")
-                return
+            amount = random.randint(2, 99)
+            print(f"   ➡️ ({bet_num}/10) Bahis miktarı giriliyor: {amount}")
+            ok = safe_input_and_click(
+                driver, wait,
+                DiamondsLocators.BET_AMOUNT_INPUT,
+                amount,
+                DiamondsLocators.BET_SUBMIT_BUTTON,
+                retries=4
+            )
+            if not ok:
+                print("   ⚠️ Bet adımı atlanıyor, bir sonraki tura geçiliyor.")
+                continue
 
-            # Bet miktarı: 2 ile 99 arasında TAMSAYI ve "," asla kullanılmayacak (virgül yok, tam sayı)
-            amount = random.randint(2, 99)  # 2 ve 99 dahil!
-            amount_str = str(amount)  # Örn: "25"
-            print(f"   ➡️ ({bet_num}/10) Bahis miktarı giriliyor: {amount_str}")
-
-            bet_input = wait.until(EC.element_to_be_clickable((By.XPATH, DiamondsLocators.BET_AMOUNT_INPUT)))
-            bet_input.click()
-            time.sleep(0.3)
-            bet_input.send_keys(Keys.CONTROL, 'a')
-            time.sleep(0.15)
-            bet_input.send_keys(Keys.DELETE)
-            time.sleep(0.3)
-            slow_type(bet_input, amount_str, delay=0.13)
-            time.sleep(1.1)
-
-            submit_btn = wait.until(EC.element_to_be_clickable((By.XPATH, DiamondsLocators.BET_SUBMIT_BUTTON)))
-            submit_btn.click()
             print("   ✅ Bahis gönderildi")
             time.sleep(2.0)
 
@@ -111,6 +128,7 @@ def test_diamonds_flow():
     driver, wait = open_browser()
     login_and_open_diamonds(driver, wait)
     play_10_bets(driver, wait)
+    time.sleep(3.0)
     driver.quit()
 
 if __name__ == "__main__":
