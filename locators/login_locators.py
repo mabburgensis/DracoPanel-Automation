@@ -2,7 +2,7 @@ class LoginLocators:
     LOGIN_BUTTON_HEADER = '//*[@id="root"]/main/header/div/nav[2]/button[1]'
     USERNAME_INPUT = '//*[@id="root"]/div[2]/div/section/div/form/div/label[1]/input'
     PASSWORD_INPUT = '//*[@id="root"]/div[2]/div/section/div/form/div/label[2]/input'
-    SUBMIT_BUTTON = '//*[@id="root"]/div[2]/div/section/div/form/button'
+    LOGIN_SUBMIT_BUTTON = '//*[@id="root"]/div[2]/div/section/div/form/button'
 
     USERNAME_REQUIRED_ERROR = '//*[@id="root"]/div[2]/div/section/div/form/div/label[1]/p'
     PASSWORD_REQUIRED_ERROR = '//*[@id="root"]/div[2]/div/section/div/form/div/label[2]/p'
