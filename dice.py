@@ -1,5 +1,6 @@
 import time
 import random
+import sys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
@@ -154,3 +155,4 @@ def test_dice_flow():
 
 if __name__ == "__main__":
     test_dice_flow()
+    sys.exit(0)

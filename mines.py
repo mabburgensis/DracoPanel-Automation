@@ -1,4 +1,5 @@
 import time, random
+import sys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
@@ -181,3 +182,4 @@ def test_mines_flow():
 
 if __name__ == "__main__":
     test_mines_flow()
+    sys.exit(0)

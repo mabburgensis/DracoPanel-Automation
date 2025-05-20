@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
+import sys
 from common.browser_utils import open_browser
 from locators.register_locators import RegisterLocators
 from common import user_data  # ✅ JSON dosyasına veri kaydı için
@@ -92,3 +93,4 @@ def test_registration_flow():
 
 if __name__ == "__main__":
     test_registration_flow()
+    sys.exit(0)
