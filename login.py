@@ -49,9 +49,9 @@ def test_login_flow():
 
     # L-02: Geçersiz kullanıcı adı
     username_el.send_keys("invalid_user")
-    time.sleep(0.7)
+    time.sleep(0.8)
     password_el.send_keys("Test123!")
-    time.sleep(0.7)
+    time.sleep(0.8)
     submit_btn.click()
     print("L-02: Geçersiz kullanıcı adı gönderildi")
     time.sleep(2)
@@ -65,6 +65,7 @@ def test_login_flow():
         user_data = load_user_data()
     except FileNotFoundError:
         raise ValueError("❗ Register verileri eksik! Lütfen önce register.py çalıştırıldığından emin olun.")
+        
     valid_username = user_data["username"]
     invalid_password = "WrongPassword123"
 
