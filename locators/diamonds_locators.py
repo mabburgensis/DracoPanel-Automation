@@ -2,7 +2,7 @@
 
 class DiamondsLocators:
 
-    DIAMONDS_BANNER = '//*[@id="root"]/main/div/div[2]/div/div[2]/a[5]/img'
+    DIAMONDS_BANNER = '//*[@id="root"]/main/div/div[2]/div/div[2]/a[4]/img'
 
     # -------- Giriş & Oyun Seçim --------
     REAL_PLAY_BUTTON = '//*[@id="root"]/main/div/div/div/button[1]'
