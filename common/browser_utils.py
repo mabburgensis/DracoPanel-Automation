@@ -9,17 +9,17 @@ def open_browser():
     chrome_options = Options()
 
     if os.environ.get("GITHUB_ACTIONS") == "true":
-        # Sadece CI ortamında headless modda çalış
+        # Only run in headless mode in CI environments
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=1920,1080")
-        print(">> Github Actions ortamı algılandı: Headless modda başlatılıyor.")
+        print(">> GitHub Actions environment detected: Starting in headless mode.")
     else:
-        print(">> Lokal ortam: GUI açık şekilde başlatılıyor.")
+        print(">> Local environment: Starting in visible (GUI) mode.")
 
-    # --- Tam buraya eklemiş oluyorsun ---
+    # Start browser
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()),
         options=chrome_options
