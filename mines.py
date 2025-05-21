@@ -71,12 +71,11 @@ def login_and_open_mines(driver, wait):
     real.click()
     print("DEBUG | Real Play tıklandı, oyun yükleniyor...")
     time.sleep(3)
-    # screenshot(driver, "mines_game_opened")
 
 def test_place_random_bet(driver, wait):
-    print("DEBUG | test_place_random_bet BAŞLADI")
+    # 1) İframe'e geç
     for i in range(3):
-        print(f"DEBUG | {i+1}. kez iframe'e geçiliyor...")
+        print(f"DEBUG |- {i+1}. kez iframe’e geçiliyor...")
         if switch_to_game_iframe(driver):
             break
         time.sleep(1)
@@ -84,6 +83,7 @@ def test_place_random_bet(driver, wait):
         print("DEBUG | test_place_random_bet: iframe bulunamadı, fonksiyondan False dönülüyor")
         return False
 
+    # 2) Bahis inputu bul
     try:
         print("DEBUG | BET_AMOUNT_INPUT aranıyor...")
         bet_in = WebDriverWait(driver, 10).until(
@@ -93,6 +93,7 @@ def test_place_random_bet(driver, wait):
         print("DEBUG | BET_AMOUNT_INPUT bulunamadı, TimeoutException")
         return False
 
+    # 3) Rastgele bahis miktarı gir
     amt = random.randint(1, 99)
     print(f"DEBUG | Rastgele bahis: {amt}")
     bet_in.clear()
@@ -101,10 +102,26 @@ def test_place_random_bet(driver, wait):
     print(f"   🎲 Bet girildi: {amt}")
     time.sleep(0.5)
 
+    # 4) Loader görünmez olana kadar bekle
+    try:
+        WebDriverWait(driver, 15).until(
+            EC.invisibility_of_element_located((By.CSS_SELECTOR, "div._loader_1g12d_17"))
+        )
+        print("DEBUG | Loader kayboldu, select açılabilir.")
+    except Exception:
+        print("WARN | Loader bulunamadı ya da çok uzun sürdü.")
+
+    # 5) Select'in enabled olmasını bekle
+    def wait_for_enabled(driver, locator, timeout=10):
+        for _ in range(timeout * 2):
+            el = driver.find_element(*locator)
+            if el.is_enabled():
+                return el
+            time.sleep(0.5)
+        raise Exception("Element enabled olmadı!")
+
+    mines_sel = wait_for_enabled(driver, (By.XPATH, MinesLocators.MINES_COUNT_SELECT))
     print("DEBUG | MINES_COUNT_SELECT aranıyor ve tıklanıyor...")
-    mines_sel = WebDriverWait(driver, 5).until(
-        EC.element_to_be_clickable((By.XPATH, MinesLocators.MINES_COUNT_SELECT))
-    )
     mines_sel.click()
     time.sleep(0.5)
     idx = random.randint(1, 24)
