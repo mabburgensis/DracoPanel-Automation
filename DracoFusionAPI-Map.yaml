@@ -1,0 +1,3696 @@
+openapi: 3.0.3
+info:
+  title: DracoFusion API
+  version: 1.0.0
+  description: "This document defines the modules (Fake Operator, Mines, Diamonds, Dice, Limbo, Keno, etc.) on the DracoFusion platform. Each module has its own unique path prefix. You can view, expand, and, if necessary, add new modules to this schema in Swagger UI."
+  contact:
+    name: DracoFusion API Team
+    email: api-support@dracofusion.com
+servers:
+- url: https://api.dracofusion.com
+  description: Production server for all modules (Fake Operator, Mines, Diamonds,
+    Dice, Limbo, Keno, DragonTower)
+tags:
+- name: FakeOperator
+  description: Operations related to the Fake Operator module (login, game access,
+    balance inquiries and updates)
+- name: Mines
+  description: Operations related to the Mines game (health, session, trap, play,
+    load, cashout, autoplay)
+- name: Diamonds
+  description: Operations related to the Diamonds game (health check, balance demo,
+    play, trap)
+- name: Dice
+  description: Operations related to the Dice game (health check, play, trap)
+- name: Limbo
+  description: Operations related to the Limbo game (health check, play, trap)
+- name: Keno
+  description: Operations related to the Keno game (health check, mark, play, trap,
+    auto-pick)
+- name: DragonTower
+  description: Operations related to the Dragon Tower game (health check, session,
+    load, trap, play, cashout, autoplay)
+- name: CoinFlip
+  description: Operations related to the CoinFlip game (health check, session, load,
+    trap, play, cashout, autoplay)
+paths:
+  /api/auth/login:
+    post:
+      tags:
+      - FakeOperator
+      summary: Admin Login
+      description: "Authenticates the admin user. Expects a JSON body containing username\
+        \ and password. \nOn success, returns a token and user object.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful, returns token and user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Bad request (missing or invalid credentials)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/game/access:
+    post:
+      tags:
+      - FakeOperator
+      summary: Game Access
+      description: 'Requests a game access URL for a user. Expects headers with a
+        valid token and a JSON body containing
+
+        currency, external_player_id, game_code, language, and player_data. On success,
+        returns a URL
+
+        containing a game-specific token.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameAccessRequest'
+      responses:
+        '200':
+          description: Game access URL returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameAccessResponse'
+        '400':
+          description: Bad request (invalid parameters or missing token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (invalid or missing token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/user/balance:
+    post:
+      tags:
+      - FakeOperator
+      summary: Get User Balance
+      description: "Retrieves the balance for a given user_id. Expects JSON body with\
+        \ user_id. \nReturns balance, currency_code, and formatted string.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserBalanceRequest'
+      responses:
+        '200':
+          description: Balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBalanceResponse'
+        '400':
+          description: Bad request (missing or invalid user_id)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (invalid or missing token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/user/update-balance:
+    post:
+      tags:
+      - FakeOperator
+      summary: Update User Balance
+      description: "Updates the balance for a given user. Expects a JSON body containing\
+        \ user_id and new_balance. \nReturns success status and updated balance info.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBalanceRequest'
+      responses:
+        '200':
+          description: Balance updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateBalanceResponse'
+        '400':
+          description: Bad request (missing or invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (invalid or missing token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/mines/health:
+    get:
+      tags:
+      - Mines
+      summary: Health Check
+      description: 'Checks if the Mines API is up and running. Returns a JSON object
+        indicating service status.
+
+        '
+      responses:
+        '200':
+          description: Service is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+  /v1/mines/session:
+    post:
+      tags:
+      - Mines
+      summary: Create Game Session
+      description: "Initiates a new Mines session. The request body must contain bet_amount,\
+        \ currency, and mines_count. \nOn success, returns a session_id.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionRequest'
+      responses:
+        '200':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '400':
+          description: Bad request (missing or invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/mines/trap:
+    post:
+      tags:
+      - Mines
+      summary: Select Cell (Trap)
+      description: 'Sends one or multiple cell indices to click within an existing
+        session. The response returns the updated
+
+        state of the board, including which cells have been clicked and the overall
+        cell array.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrapRequest'
+      responses:
+        '200':
+          description: Cell selected successfully, returned game state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrapResponse'
+        '400':
+          description: Invalid session_id or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/mines/play:
+    post:
+      tags:
+      - Mines
+      summary: Make a Move (Play)
+      description: 'Makes a single move by clicking a specific cell index within a
+        session. Returns action and result details.
+
+        If the move results in a loss, the complete cell array is returned.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlayRequest'
+      responses:
+        '200':
+          description: Move made successfully, returned result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayResponse'
+        '400':
+          description: Invalid session_id or invalid move (e.g., clicking the same
+            cell twice)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/mines/load:
+    get:
+      tags:
+      - Mines
+      summary: Load Existing Session
+      description: 'Checks for an active Mine session for the user based on X-Player-Token
+        header. If a session exists,
+
+        returns the session object; otherwise, indicates no active session.
+
+        '
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      responses:
+        '200':
+          description: Session check successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoadResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/mines/cashout:
+    post:
+      tags:
+      - Mines
+      summary: End Session (Cashout)
+      description: 'Ends the current session or performs a cashout for the user. If
+        successful, returns
+
+        action="cashout" and result="win" or result="loss". If an error occurs (e.g.,
+        no active session),
+
+        returns an error response.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashoutRequest'
+      responses:
+        '200':
+          description: Cashout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashoutSuccessResponse'
+        '400':
+          description: Bad request (e.g., no active session or invalid session_id)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashoutErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/mines/autoplay:
+    post:
+      tags:
+      - Mines
+      summary: Automatic Play (AutoPlay)
+      description: 'Performs multiple moves in automatic mode by specifying an array
+        of cell indices. Each index is
+
+        clicked in order. Returns action and result details for the autoplay sequence.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutoPlayRequest'
+      responses:
+        '200':
+          description: Autoplay completed, returned results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutoPlayResponse'
+        '400':
+          description: Bad request (invalid parameters or session)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /diamonds/v1/health:
+    get:
+      tags:
+      - Diamonds
+      summary: HealthCheckAPI-Diamonds
+      description: 'Checks if the Diamonds API is up and running. Returns a JSON object
+        indicating service status.
+
+        '
+      responses:
+        '200':
+          description: Diamonds service is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckDiamondsResponse'
+  /diamonds/v1/balance:
+    get:
+      tags:
+      - Diamonds
+      summary: BalanceDemoToken
+      description: 'Retrieves a demo balance for the Diamonds game using a demo token.
+        Requires header X-Demo-Token.
+
+        '
+      parameters:
+      - in: header
+        name: X-Demo-Token
+        required: true
+        schema:
+          type: string
+          description: Demo token for accessing balance endpoint
+      responses:
+        '200':
+          description: Demo balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DemoBalanceResponse'
+        '401':
+          description: Unauthorized (missing or invalid demo token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /diamonds/v1/play:
+    post:
+      tags:
+      - Diamonds
+      summary: Play Diamonds
+      description: 'Initiates a play in the Diamonds game. Requires headers X-Player-Token
+        and X-Demo-Token,
+
+        plus a JSON body containing bet_amount and currency.
+
+        '
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      - in: header
+        name: X-Demo-Token
+        required: true
+        schema:
+          type: string
+          description: Demo token for Diamonds API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiamondsPlayRequest'
+      responses:
+        '200':
+          description: Diamonds play completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiamondsPlayResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing/invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /diamonds/v1/trap:
+    post:
+      tags:
+      - Diamonds
+      summary: Trap Diamonds
+      description: 'Executes a trap action in the Diamonds game. Requires headers
+        X-Player-Token and X-Demo-Token,
+
+        plus a JSON body containing bet_amount and currency. Function is similar to
+        /diamonds/v1/play.
+
+        '
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      - in: header
+        name: X-Demo-Token
+        required: true
+        schema:
+          type: string
+          description: Demo token for Diamonds API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiamondsTrapRequest'
+      responses:
+        '200':
+          description: Diamonds trap completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiamondsTrapResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing/invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dice/v1/health:
+    get:
+      tags:
+      - Dice
+      summary: HealthCheckAPI-Dice
+      description: 'Checks if the Dice API is up and running. Returns a JSON object
+        indicating service status.
+
+        '
+      responses:
+        '200':
+          description: Dice service is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckDiceResponse'
+  /dice/v1/play:
+    post:
+      tags:
+      - Dice
+      summary: Play Dice
+      description: "Initiates a play in the Dice game. Requires header X-Player-Token,\
+        \ plus a JSON body containing \nbet_amount, rate, and is_under.\n"
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DicePlayRequest'
+      responses:
+        '200':
+          description: Dice play completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DicePlayResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing/invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dice/v1/trap:
+    post:
+      tags:
+      - Dice
+      summary: Trap Dice
+      description: "Executes a trap action in the Dice game. Requires header X-Player-Token,\
+        \ plus a JSON body containing \nbet_amount, rate, and is_under. Function is\
+        \ similar to /dice/v1/play.\n"
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiceTrapRequest'
+      responses:
+        '200':
+          description: Dice trap completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiceTrapResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing/invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /limbo/v1/health:
+    get:
+      tags:
+      - Limbo
+      summary: HealthCheckAPI-Limbo
+      description: 'Checks if the Limbo API is up and running. Returns a JSON object
+        indicating service status.
+
+        '
+      responses:
+        '200':
+          description: Limbo service is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckLimboResponse'
+  /limbo/v1/play:
+    post:
+      tags:
+      - Limbo
+      summary: Play Limbo
+      description: "Initiates a play in the Limbo game or makes a move in an existing\
+        \ session. Requires a JSON body \ncontaining bet_amount, currency, and multiplier.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LimboPlayRequest'
+      responses:
+        '200':
+          description: Limbo play/move completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimboPlayResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing/invalid token, if applicable)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /limbo/v1/trap:
+    post:
+      tags:
+      - Limbo
+      summary: Trap Limbo
+      description: "Executes a trap (continue/cashout) action in the Limbo game. Requires\
+        \ a JSON body containing \nbet_amount, currency, and multiplier.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LimboTrapRequest'
+      responses:
+        '200':
+          description: Limbo trap action completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimboTrapResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing/invalid token, if applicable)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /keno/v1/health:
+    get:
+      tags:
+      - Keno
+      summary: HealthCheckAPI-Keno
+      description: 'Checks if the Keno API is up and running. Returns a JSON object
+        indicating service status.
+
+        '
+      responses:
+        '200':
+          description: Keno service is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckKenoResponse'
+  /keno/v1/mark:
+    post:
+      tags:
+      - Keno
+      summary: Mark
+      description: 'Returns marking possibilities based on count and level.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KenoMarkRequest'
+      responses:
+        '200':
+          description: Mark possibilities returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KenoMarkResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /keno/v1/play:
+    post:
+      tags:
+      - Keno
+      summary: Play Keno
+      description: 'Starts a Keno game with specified numbers. Returns game result.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KenoPlayRequest'
+      responses:
+        '200':
+          description: Keno play completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KenoPlayResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /keno/v1/trap:
+    post:
+      tags:
+      - Keno
+      summary: Trap Keno
+      description: 'Executes trap action in Keno based on user’s numbers. Returns
+        detailed outcome.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KenoTrapRequest'
+      responses:
+        '200':
+          description: Trap action completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KenoTrapResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /keno/v1/auto-pick:
+    post:
+      tags:
+      - Keno
+      summary: Auto Pick
+      description: 'Returns an automatic set of 10 unique numbers (0–39). If an input
+        If an index list is provided, it is always included in the result.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KenoAutoPickRequest'
+      responses:
+        '200':
+          description: Auto-picked numbers returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KenoAutoPickResponse'
+        '400':
+          description: Bad request (missing/invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dragontower/v1/health:
+    get:
+      tags:
+      - DragonTower
+      summary: HealthCheckAPI-DragonTower
+      description: 'Checks if the Dragon Tower API is up and running. Returns a JSON
+        object indicating service status.
+
+        '
+      responses:
+        '200':
+          description: Dragon Tower service is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckDragonTowerResponse'
+  /dragontower/v1/session:
+    post:
+      tags:
+      - DragonTower
+      summary: Create Dragon Tower Session
+      description: 'Initiates a new Dragon Tower session. Expects a JSON body containing
+        bet_amount, currency, and level.
+
+        On success, returns a session_id.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DragonTowerSessionRequest'
+      responses:
+        '200':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DragonTowerSessionResponse'
+        '400':
+          description: Bad request (missing or invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dragontower/v1/load:
+    post:
+      tags:
+      - DragonTower
+      summary: Load Existing Dragon Tower Session
+      description: "Checks if there is an active Dragon Tower session for the user\
+        \ based on X-Player-Token header. \nIf a session exists, returns its details;\
+        \ otherwise indicates no active session.\n"
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      responses:
+        '200':
+          description: Session check successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DragonTowerLoadResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dragontower/v1/trap:
+    post:
+      tags:
+      - DragonTower
+      summary: Dragon Tower Trap (Select Tile)
+      description: "Sends a tile index to click within an existing session. Returns\
+        \ updated game state including \ntiles_clicked and full cells array (6×6 grid).\n"
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DragonTowerTrapRequest'
+      responses:
+        '200':
+          description: Tile clicked successfully, returned game state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DragonTowerTrapResponse'
+        '400':
+          description: Invalid session_id or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dragontower/v1/play:
+    post:
+      tags:
+      - DragonTower
+      summary: Dragon Tower Play (Continue/Cashout Decision)
+      description: "Makes a move by clicking a specific tile index within a session.\
+        \ Returns action and result details. \nIf the move results in a loss or requires\
+        \ revealing the board, the complete cells array (6×6 grid) is returned.\n"
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DragonTowerPlayRequest'
+      responses:
+        '200':
+          description: Move made successfully, returned result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DragonTowerPlayResponse'
+        '400':
+          description: Invalid session_id or invalid move
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dragontower/v1/cashout:
+    post:
+      tags:
+      - DragonTower
+      summary: Dragon Tower Cashout
+      description: "Ends the current Dragon Tower session or performs a cashout. If\
+        \ successful, returns action=\"cashout\" \nand result=\"win\" or result=\"\
+        loss\". If an error occurs (e.g., no active session), returns an error.\n"
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DragonTowerCashoutRequest'
+      responses:
+        '200':
+          description: Cashout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DragonTowerCashoutSuccessResponse'
+        '400':
+          description: Bad request (e.g., no active session or invalid session_id)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /dragontower/v1/autoplay:
+    post:
+      tags:
+      - DragonTower
+      summary: Dragon Tower Automatic Play (AutoPlay)
+      description: "Performs multiple moves automatically by specifying an array of\
+        \ tile indices. Each index is clicked \nin order. Returns action and result\
+        \ details for the autoplay sequence.\n"
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DragonTowerAutoPlayRequest'
+      responses:
+        '200':
+          description: Autoplay completed, returned results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DragonTowerAutoPlayResponse'
+        '400':
+          description: Bad request (invalid parameters or session)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /coinflip/v1/health:
+    get:
+      tags:
+      - CoinFlip
+      summary: Health Check CoinFlip
+      description: 'Checks if the CoinFlip API is up and running. Returns a JSON object
+        indicating service status.
+
+        '
+      responses:
+        '200':
+          description: CoinFlip service is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckCoinFlipResponse'
+  /coinflip/v1/session:
+    post:
+      tags:
+      - CoinFlip
+      summary: Create CoinFlip Session
+      description: "Initiates a new CoinFlip session. Expects a JSON body containing\
+        \ `bet_amount` and `currency`. \nOn success, returns a `session_id`.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoinFlipSessionRequest'
+      responses:
+        '200':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinFlipSessionResponse'
+        '400':
+          description: Bad request (missing or invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /coinflip/v1/load:
+    get:
+      tags:
+      - CoinFlip
+      summary: Load Existing CoinFlip Session
+      description: 'Checks if there is an active CoinFlip session for the user based
+        on `X-Player-Token` header.
+
+        If a session exists, returns its details; otherwise indicates no active session.
+
+        '
+      parameters:
+      - in: header
+        name: X-Player-Token
+        required: true
+        schema:
+          type: string
+          description: User authentication token
+      responses:
+        '200':
+          description: Session check successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinFlipLoadResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /coinflip/v1/trap:
+    post:
+      tags:
+      - CoinFlip
+      summary: Trap CoinFlip
+      description: "Executes a trap action in an ongoing CoinFlip session by specifying\
+        \ `session_id`. \nReturns updated session status and any accrued profit.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoinFlipTrapRequest'
+      responses:
+        '200':
+          description: Trap action completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinFlipTrapResponse'
+        '400':
+          description: Bad request (missing or invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /coinflip/v1/play:
+    post:
+      tags:
+      - CoinFlip
+      summary: Play CoinFlip
+      description: "Makes a flip (heads/tails) within an existing session. Expects\
+        \ `session_id` and `choice` (“heads” veya “tails”)  \nin request body. Returns\
+        \ outcome details and updated profit if any.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoinFlipPlayRequest'
+      responses:
+        '200':
+          description: Play completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinFlipPlayResponse'
+        '400':
+          description: Bad request (missing or invalid parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /coinflip/v1/cashout:
+    post:
+      tags:
+      - CoinFlip
+      summary: Cashout CoinFlip
+      description: 'Ends the current CoinFlip session or performs a cashout. If successful,
+        returns `action="cashout"`
+
+        and result details (win/loss and final profit). If no active session, hata
+        döner.
+
+        '
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoinFlipCashoutRequest'
+      responses:
+        '200':
+          description: Cashout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinFlipCashoutResponse'
+        '400':
+          description: Bad request (e.g., no active session or invalid session_id)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /coinflip/v1/autoplay:
+    post:
+      tags:
+      - CoinFlip
+      summary: CoinFlip Automatic Play (AutoPlay)
+      description: "Automatically performs multiple flips in one request by specifying\
+        \ `session_id` and `choices` (array of “heads”/“tails”). \nEach choice is processed in order\
+        \ Returns all results and final profit information.\n"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoinFlipAutoPlayRequest'
+      responses:
+        '200':
+          description: Autoplay completed, returned results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinFlipAutoPlayResponse'
+        '400':
+          description: Bad request (invalid parameters or session)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (missing or invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      description: Admin login credentials
+      required:
+      - username
+      - password
+      properties:
+        username:
+          type: string
+          example: tutgun17
+          description: Admin username
+        password:
+          type: string
+          format: password
+          example: 1234
+          description: Admin password
+    UserObject:
+      type: object
+      description: User details object returned on login
+      properties:
+        id:
+          type: integer
+          example: 255
+        username:
+          type: string
+          example: tutgun17
+        email:
+          type: string
+          example: tutgun17@tutgun17
+        created_at:
+          type: string
+          format: date-time
+          example: 2025-05-08 15:18:03+00:00
+        first_name:
+          type: string
+          example: tutgun17
+        last_name:
+          type: string
+          example: Player
+        phone:
+          type: string
+          example: '+905556453202'
+        birth_date:
+          type: string
+          format: date
+          example: 1990-01-01
+        country_code:
+          type: string
+          example: TR
+        city:
+          type: string
+          example: Istanbul
+        currency:
+          type: string
+          example: TRY
+        ip:
+          type: string
+          example: 127.0.0.1
+        language:
+          type: string
+          example: tr
+        timezone:
+          type: string
+          example: Europe/Istanbul
+        balance:
+          type: string
+          example: '46602080.32'
+        currency_code:
+          type: string
+          example: eur
+    LoginResponse:
+      type: object
+      description: Response schema for admin login
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          description: Authentication token (Bearer)
+        user:
+          $ref: '#/components/schemas/UserObject'
+    GameAccessRequest:
+      type: object
+      description: Request schema to obtain a game access URL
+      required:
+      - currency
+      - external_player_id
+      - game_code
+      - language
+      - player_data
+      properties:
+        currency:
+          type: string
+          example: eur
+          description: Currency code
+        external_player_id:
+          type: integer
+          example: 255
+          description: External player identifier
+        game_code:
+          type: string
+          example: MI-X1YZ
+          description: Game code
+        language:
+          type: string
+          example: tr
+          description: Language code
+        player_data:
+          $ref: '#/components/schemas/UserObject'
+    GameAccessResponse:
+      type: object
+      description: Response schema for game access request
+      properties:
+        url:
+          type: string
+          example: https://game123.dracofusion.com?token=abc123&currency=eur&language=tr&external_player_id=255
+          description: URL to access the game, contains a game-specific token
+    UserBalanceRequest:
+      type: object
+      description: Request schema to retrieve user balance
+      required:
+      - user_id
+      properties:
+        user_id:
+          type: integer
+          example: 255
+          description: User identifier
+    UserBalanceResponse:
+      type: object
+      description: Response schema for retrieving user balance
+      properties:
+        balance:
+          type: string
+          example: '46602080.32'
+          description: Balance as a numeric string
+        currency_code:
+          type: string
+          example: EUR
+          description: Three-letter currency code
+        formatted:
+          type: string
+          example: 46602080.32 EUR
+          description: Formatted balance string
+    UpdateBalanceRequest:
+      type: object
+      description: Request schema to update user balance
+      required:
+      - user_id
+      - new_balance
+      properties:
+        user_id:
+          type: integer
+          example: 386
+          description: User identifier
+        new_balance:
+          type: number
+          format: float
+          example: 1
+          description: New balance amount
+    UpdateBalanceResponse:
+      type: object
+      description: Response schema for updating user balance
+      properties:
+        success:
+          type: boolean
+          example: true
+          description: Indicates if the update succeeded
+        balance:
+          type: string
+          example: '1.00'
+          description: Updated balance as a numeric string
+        currency_code:
+          type: string
+          example: USD
+          description: Three-letter currency code
+        formatted:
+          type: string
+          example: 1.00 USD
+          description: Formatted updated balance string
+    ErrorResponse:
+      type: object
+      description: Standard error response for all endpoints
+      properties:
+        type:
+          type: string
+          enum:
+          - error
+          description: Fixed value "error"
+        status:
+          type: integer
+          description: HTTP status code
+        code:
+          type: string
+          description: Application-specific error code (e.g., GAM_007)
+        message:
+          type: string
+          description: Error message
+        details:
+          type: string
+          nullable: true
+          description: Additional error details (optional)
+    HealthCheckResponse:
+      type: object
+      description: Response schema for health check endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        message:
+          type: string
+          example: Mines API is up and running.
+          description: Informational message
+    SessionRequest:
+      type: object
+      description: Parameters to create a new Mines session
+      required:
+      - bet_amount
+      - currency
+      - mines_count
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "543")
+          example: '543'
+        currency:
+          type: string
+          description: Currency code (3-letter ISO, e.g., "TRY")
+          example: TRY
+        mines_count:
+          type: integer
+          description: Number of mines to play (e.g., 3)
+          example: 3
+    SessionResponse:
+      type: object
+      description: Successful response for session creation
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        data:
+          type: object
+          description: Session details
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: ab12cd34-ef56-7890-ab12-cd34ef567890
+              description: Unique session identifier
+            bet_amount:
+              type: string
+              example: '543'
+              description: Bet amount (echoed back)
+            currency:
+              type: string
+              example: TRY
+              description: Currency (echoed back)
+            status:
+              type: string
+              example: playing
+              description: Initial session status
+            mines_count:
+              type: integer
+              example: 3
+              description: Number of mines configured
+    TrapRequest:
+      type: object
+      description: Request to click one or more cell indices
+      required:
+      - session_id
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: ab12cd34-ef56-7890-ab12-cd34ef567890
+          description: Active session ID
+        index:
+          type: integer
+          nullable: true
+          description: Single cell index to click (0–24)
+          example: 11
+        indexes:
+          type: array
+          items:
+            type: integer
+          nullable: true
+          description: Array of cell indices for multiple clicks
+          example:
+          - 0
+          - 5
+          - 12
+      oneOf:
+      - required:
+        - session_id
+        - index
+      - required:
+        - session_id
+        - indexes
+    TrapResponse:
+      type: object
+      description: Successful response after clicking cells
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Current session state
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            bet_amount:
+              type: string
+            currency:
+              type: string
+            status:
+              type: string
+              description: Session status (e.g., "playing" or "ended")
+            profit:
+              type: string
+              description: Profit or loss as numeric string
+            coefficient:
+              type: string
+              description: Coefficient as numeric string
+            mines_count:
+              type: integer
+              description: Number of mines configured
+            tiles_clicked:
+              type: array
+              items:
+                type: integer
+              description: Array of clicked cell indices
+            cells:
+              type: array
+              items:
+                type: integer
+                enum:
+                - 0
+                - 1
+              description: Full board state (0 for empty, 1 for mine)
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: ab12cd34-ef56-7890-ab12-cd34ef567890
+          bet_amount: '543'
+          currency: TRY
+          status: playing
+          profit: '120'
+          coefficient: '1.20'
+          mines_count: 3
+          tiles_clicked:
+          - 11
+          cells:
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+    PlayRequest:
+      type: object
+      description: Request to make a single move by clicking a cell index
+      required:
+      - session_id
+      - index
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: ab12cd34-ef56-7890-ab12-cd34ef567890
+        index:
+          type: integer
+          description: Cell index to click (0–24)
+          example: 11
+    PlayResponse:
+      type: object
+      description: Successful response after a single move
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Result details
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              description: Operation type (e.g., "click" or "result")
+              example: click
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              description: Move outcome
+              example: win
+            bet_amount:
+              type: string
+            profit:
+              type: string
+            coefficient:
+              type: string
+            mines_count:
+              type: integer
+            tile_index:
+              type: integer
+              description: Index of the clicked cell
+            tiles_clicked:
+              type: array
+              items:
+                type: integer
+            cells:
+              type: array
+              items:
+                type: integer
+                enum:
+                - 0
+                - 1
+              nullable: true
+              description: Full board state if the game ended (loss or action=result)
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: ab12cd34-ef56-7890-ab12-cd34ef567890
+          action: result
+          result: loss
+          bet_amount: '543'
+          profit: '0'
+          coefficient: '1.00'
+          mines_count: 3
+          tile_index: 11
+          tiles_clicked:
+          - 11
+          cells:
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+    LoadResponse:
+      type: object
+      description: Response for checking existing session
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Session existence and details
+          properties:
+            session_exists:
+              type: boolean
+              description: Indicates if there is an active session
+              example: true
+            session:
+              type: object
+              nullable: true
+              description: Session details if an active session exists
+              properties:
+                session_id:
+                  type: string
+                  format: uuid
+                bet_amount:
+                  type: string
+                currency:
+                  type: string
+                status:
+                  type: string
+                profit:
+                  type: string
+                coefficient:
+                  type: string
+                mines_count:
+                  type: integer
+                tiles_clicked:
+                  type: array
+                  items:
+                    type: integer
+      example:
+        type: success
+        status: 200
+        data:
+          session_exists: true
+          session:
+            session_id: ab12cd34-ef56-7890-ab12-cd34ef567890
+            bet_amount: '543'
+            currency: TRY
+            status: playing
+            profit: '120'
+            coefficient: '1.20'
+            mines_count: 3
+            tiles_clicked:
+            - 11
+    CashoutRequest:
+      type: object
+      description: Request to end session or perform cashout
+      required:
+      - session_id
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: ab12cd34-ef56-7890-ab12-cd34ef567890
+    CashoutSuccessResponse:
+      allOf:
+      - $ref: '#/components/schemas/SuccessBase'
+      - type: object
+        properties:
+          data:
+            type: object
+            properties:
+              action:
+                type: string
+                example: cashout
+              result:
+                type: string
+                enum:
+                - win
+                - loss
+                example: win
+              bet_amount:
+                type: string
+                example: '543'
+              profit:
+                type: string
+                example: '120'
+              coefficient:
+                type: string
+                example: '1.20'
+      description: Successful cashout response
+    CashoutErrorResponse:
+      allOf:
+      - $ref: '#/components/schemas/ErrorResponse'
+      description: Cashout error (e.g., no active session)
+    AutoPlayRequest:
+      type: object
+      description: Request for automatic play with multiple clicks
+      required:
+      - bet_amount
+      - currency
+      - mines_count
+      - indexes
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: Existing session ID (optional if creating new session)
+          example: ab12cd34-ef56-7890-ab12-cd34ef567890
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string
+          example: '100'
+        currency:
+          type: string
+          description: Currency code (e.g., “TRY”)
+          example: TRY
+        mines_count:
+          type: integer
+          description: Number of mines to play
+          example: 3
+        indexes:
+          type: array
+          description: Array of cell indices to click automatically
+          items:
+            type: integer
+          example:
+          - 0
+          - 1
+          - 5
+    AutoPlayResponse:
+      type: object
+      description: Response for automatic play
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: autoplay
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: win
+            bet_amount:
+              type: string
+            profit:
+              type: string
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: ab12cd34-ef56-7890-ab12-cd34ef567890
+          action: autoplay
+          result: win
+          bet_amount: '100'
+          profit: '50'
+    HealthCheckDiamondsResponse:
+      type: object
+      description: Response schema for Diamonds health check endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        message:
+          type: string
+          example: Diamonds API is up and running.
+          description: Informational message
+    DemoBalanceResponse:
+      type: object
+      description: Response schema for retrieving demo balance in Diamonds
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        data:
+          type: object
+          properties:
+            player_id:
+              type: string
+              example: demo-96cf86e4-8df6-4245-850b-da16363a49c5
+              description: Demo player ID
+            balance:
+              type: string
+              example: '1000.00'
+              description: Balance as a numeric string
+            currency:
+              type: string
+              example: USD
+              description: Three-letter currency code
+    DiamondsPlayRequest:
+      type: object
+      description: Request to play the Diamonds game
+      required:
+      - bet_amount
+      - currency
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "10")
+          example: '10'
+        currency:
+          type: string
+          description: Currency code (3-letter ISO, e.g., "TRY")
+          example: TRY
+    DiamondsPlayResponse:
+      type: object
+      description: Response schema for Diamonds play endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        data:
+          type: object
+          description: Details of the play outcome
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: ab12cd34-ef56-7890-ab12-cd34ef567890
+              description: Unique session identifier
+            action:
+              type: string
+              example: play
+              description: Operation type
+            bet_amount:
+              type: string
+              example: '10'
+            coefficient:
+              type: string
+              example: '1.50'
+            profit:
+              type: string
+              example: '15.00'
+            numbers:
+              type: array
+              items:
+                type: integer
+              description: Array of numbers selected/drawn
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: win
+              description: Outcome of the play
+    DiamondsTrapRequest:
+      type: object
+      description: Request to execute trap action in Diamonds
+      required:
+      - bet_amount
+      - currency
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "120")
+          example: '120'
+        currency:
+          type: string
+          description: Currency code (3-letter ISO, e.g., "TRY")
+          example: TRY
+    DiamondsTrapResponse:
+      type: object
+      description: Response schema for Diamonds trap endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        data:
+          type: object
+          description: Details of the trap outcome
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: ab12cd34-ef56-7890-ab12-cd34ef567890
+              description: Unique session identifier
+            action:
+              type: string
+              example: trap
+              description: Operation type
+            bet_amount:
+              type: string
+              example: '120'
+            coefficient:
+              type: string
+              example: '2.00'
+            profit:
+              type: string
+              example: '0'
+            numbers:
+              type: array
+              items:
+                type: integer
+              description: Array of numbers selected/drawn
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: loss
+              description: Outcome of the trap
+    SuccessBase:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+    HealthCheckDiceResponse:
+      type: object
+      description: Response schema for Dice health check endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        message:
+          type: string
+          example: Dice API is up and running.
+          description: Informational message
+    DicePlayRequest:
+      type: object
+      description: Request to play the Dice game
+      required:
+      - bet_amount
+      - rate
+      - is_under
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "10")
+          example: '10'
+        rate:
+          type: number
+          description: The target rate (0–100)
+          example: 50
+        is_under:
+          type: boolean
+          description: True if betting under the rate, false otherwise
+          example: true
+    DicePlayResponse:
+      type: object
+      description: Response schema for Dice play endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        data:
+          type: object
+          description: Details of the play outcome
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: ab12cd34-ef56-7890-ab12-cd34ef567890
+              description: Unique session identifier
+            action:
+              type: string
+              example: play
+              description: Operation type
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: win
+              description: Outcome of the roll
+            bet_amount:
+              type: string
+              example: '10'
+            profit:
+              type: string
+              example: '15.00'
+            coefficient:
+              type: string
+              example: '1.50'
+            rate:
+              type: number
+              example: 50
+            is_under:
+              type: boolean
+              example: true
+            multiplier:
+              type: string
+              example: '1.50'
+              description: Multiplier applied to the bet
+    DiceTrapRequest:
+      type: object
+      description: Request to execute trap action in the Dice game
+      required:
+      - bet_amount
+      - rate
+      - is_under
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "10")
+          example: '10'
+        rate:
+          type: number
+          description: The target rate (0–100)
+          example: 50
+        is_under:
+          type: boolean
+          description: True if betting under the rate, false otherwise
+          example: true
+    DiceTrapResponse:
+      type: object
+      description: Response schema for Dice trap endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        data:
+          type: object
+          description: Details of the trap outcome
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: ab12cd34-ef56-7890-ab12-cd34ef567890
+              description: Unique session identifier
+            action:
+              type: string
+              example: trap
+              description: Operation type
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: loss
+              description: Outcome of the roll
+            bet_amount:
+              type: string
+              example: '10'
+            profit:
+              type: string
+              example: '0'
+            coefficient:
+              type: string
+              example: '1.00'
+            rate:
+              type: number
+              example: 50
+            is_under:
+              type: boolean
+              example: true
+            multiplier:
+              type: string
+              example: '1.00'
+              description: Multiplier applied to the bet
+    HealthCheckLimboResponse:
+      type: object
+      description: Response schema for Limbo health check endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        message:
+          type: string
+          example: Limbo API is up and running.
+          description: Informational message
+    LimboPlayRequest:
+      type: object
+      description: Request to initiate or continue a Limbo session
+      required:
+      - bet_amount
+      - currency
+      - multiplier
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "100000")
+          example: '100000'
+        currency:
+          type: string
+          description: Currency code (3-letter ISO, e.g., "TRY")
+          example: TRY
+        multiplier:
+          type: number
+          description: Multiplier to apply (e.g., 1.1)
+          example: 1.1
+    LimboPlayResponse:
+      type: object
+      description: Response schema for Limbo play endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        data:
+          type: object
+          description: Details of the play outcome
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: ab12cd34-ef56-7890-ab12-cd34ef567890
+              description: Unique session identifier
+            action:
+              type: string
+              example: play
+              description: Operation type
+            bet_amount:
+              type: string
+              example: '100000'
+            multiplier:
+              type: number
+              example: 1.1
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: win
+              description: Outcome of the play
+            payout:
+              type: string
+              example: '110000.00'
+              description: Amount returned if win
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: ab12cd34-ef56-7890-ab12-cd34ef567890
+          action: play
+          bet_amount: '100000'
+          multiplier: 1.1
+          result: win
+          payout: '110000.00'
+    LimboTrapRequest:
+      type: object
+      description: Request to execute a trap (cashout) action in Limbo
+      required:
+      - bet_amount
+      - currency
+      - multiplier
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "100")
+          example: '100'
+        currency:
+          type: string
+          description: Currency code (3-letter ISO, e.g., "TRY")
+          example: TRY
+        multiplier:
+          type: number
+          description: Multiplier to apply (e.g., 10)
+          example: 10
+    LimboTrapResponse:
+      type: object
+      description: Response schema for Limbo trap endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        data:
+          type: object
+          description: Details of the trap outcome
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: ab12cd34-ef56-7890-ab12-cd34ef567890
+              description: Unique session identifier
+            action:
+              type: string
+              example: trap
+              description: Operation type
+            bet_amount:
+              type: string
+              example: '100'
+            multiplier:
+              type: number
+              example: 10
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: loss
+              description: Outcome of the trap
+            payout:
+              type: string
+              example: '0.00'
+              description: Amount returned if win; "0.00" if loss
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: ab12cd34-ef56-7890-ab12-cd34ef567890
+          action: trap
+          bet_amount: '100'
+          multiplier: 10
+          result: loss
+          payout: '0.00'
+    HealthCheckKenoResponse:
+      type: object
+      description: Response schema for Keno health check endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        message:
+          type: string
+          example: Keno API is up and running.
+          description: Informational message
+    KenoMarkRequest:
+      type: object
+      required:
+      - count
+      - level
+      properties:
+        count:
+          type: integer
+          description: Number of spots to mark (e.g., 7)
+          example: 7
+        level:
+          type: integer
+          description: Game level (e.g., 3)
+          example: 3
+    KenoMarkResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          properties:
+            possibilities:
+              type: array
+              items:
+                type: object
+                properties:
+                  multiplier:
+                    type: number
+                    description: Multiplier
+                  chance:
+                    type: number
+                    description: Probability
+      example:
+        type: success
+        status: 200
+        data:
+          possibilities:
+          - multiplier: 2.5
+            chance: 0.12
+          - multiplier: 3.0
+            chance: 0.08
+    KenoPlayRequest:
+      type: object
+      required:
+      - bet_amount
+      - currency
+      - index
+      - level
+      properties:
+        bet_amount:
+          type: string
+          example: '10'
+          description: Bet amount (numeric-string)
+        currency:
+          type: string
+          example: TRY
+          description: Currency (ISO 3-letter)
+        index:
+          type: array
+          items:
+            type: integer
+          description: Selected numbers (10 items, in the range 0–39)
+          example:
+          - 33
+          - 13
+          - 38
+          - 25
+          - 26
+          - 18
+          - 36
+          - 21
+          - 0
+          - 2
+        level:
+          type: integer
+          example: 3
+          description: Game Level
+    KenoPlayResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: play
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+            bet_amount:
+              type: string
+            payout:
+              type: string
+            profit:
+              type: string
+            coefficient:
+              type: string
+            winning_numbers:
+              type: array
+              items:
+                type: integer
+            current_balance:
+              type: string
+              nullable: true
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: ab12cd34-ef56-7890-ab12-cd34ef567890
+          action: result
+          result: win
+          bet_amount: '10'
+          payout: '50.00'
+          profit: '40.00'
+          coefficient: '5.00'
+          winning_numbers:
+          - 5
+          - 13
+          - 26
+          current_balance: '1234.56'
+    KenoTrapRequest:
+      type: object
+      required:
+      - bet_amount
+      - currency
+      - index
+      - level
+      properties:
+        bet_amount:
+          type: string
+          example: '10'
+        currency:
+          type: string
+          example: TRY
+        index:
+          type: array
+          items:
+            type: integer
+          description: Selected numbers (10 items, 0–39)
+          example:
+          - 33
+          - 13
+          - 38
+          - 25
+          - 26
+          - 18
+          - 36
+          - 21
+          - 0
+          - 2
+        level:
+          type: integer
+          example: 3
+    KenoTrapResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: trap
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+            bet_amount:
+              type: string
+            payout:
+              type: string
+            profit:
+              type: string
+            coefficient:
+              type: string
+            winning_numbers:
+              type: array
+              items:
+                type: integer
+            index:
+              type: array
+              items:
+                type: integer
+            current_balance:
+              type: string
+              nullable: true
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: ab12cd34-ef56-7890-ab12-cd34ef567890
+          action: trap
+          result: loss
+          bet_amount: '10'
+          payout: '0'
+          profit: '0.00'
+          coefficient: '0.00'
+          winning_numbers:
+          - 5
+          - 13
+          - 26
+          index:
+          - 33
+          - 13
+          - 38
+          - 25
+          - 26
+          - 18
+          - 36
+          - 21
+          - 0
+          - 2
+          current_balance: '1230.00'
+    KenoAutoPickRequest:
+      type: object
+      required:
+      - index
+      properties:
+        index:
+          type: array
+          items:
+            type: integer
+          description: Optional, the user's previously selected numbers (in the range 0–39)
+          example:
+          - 1
+          - 3
+          - 24
+          - 25
+          - 39
+    KenoAutoPickResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          properties:
+            index:
+              type: array
+              items:
+                type: integer
+              description: Automatically selected 10 unique numbers (0–39)
+      example:
+        type: success
+        status: 200
+        data:
+          index:
+          - 5
+          - 12
+          - 17
+          - 22
+          - 29
+          - 31
+          - 33
+          - 36
+          - 38
+          - 40
+    HealthCheckDragonTowerResponse:
+      type: object
+      description: Response schema for Dragon Tower health check endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        message:
+          type: string
+          example: Dragon Tower API is up and running.
+          description: Informational message
+    DragonTowerSessionRequest:
+      type: object
+      description: Request schema to create a new Dragon Tower session
+      required:
+      - bet_amount
+      - currency
+      - level
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "100")
+          example: '100'
+        currency:
+          type: string
+          description: Currency code (3-letter ISO, e.g., "TRY")
+          example: TRY
+        level:
+          type: integer
+          description: Game level (e.g., 3)
+          example: 3
+    DragonTowerSessionResponse:
+      type: object
+      description: Successful response for Dragon Tower session creation
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Session details
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: abc12345-6789-abcd-ef01-23456789abcd
+              description: Unique session identifier
+            bet_amount:
+              type: string
+              example: '100'
+            currency:
+              type: string
+              example: TRY
+            level:
+              type: integer
+              example: 3
+            status:
+              type: string
+              example: playing
+            profit:
+              type: string
+              description: Current profit (numeric string), if applicable
+            coefficient:
+              type: string
+              description: Current coefficient (numeric string), if applicable
+    DragonTowerLoadResponse:
+      type: object
+      description: Response for loading an existing Dragon Tower session
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Session existence and details
+          properties:
+            session_exists:
+              type: boolean
+              description: Indicates if there is an active session
+              example: true
+            session:
+              type: object
+              nullable: true
+              description: Session details if an active session exists
+              properties:
+                session_id:
+                  type: string
+                  format: uuid
+                bet_amount:
+                  type: string
+                currency:
+                  type: string
+                level:
+                  type: integer
+                status:
+                  type: string
+                profit:
+                  type: string
+                coefficient:
+                  type: string
+                tiles_clicked:
+                  type: array
+                  items:
+                    type: integer
+                cells:
+                  type: array
+                  items:
+                    type: integer
+                  description: Full grid state (6×6, values 0 or 1)
+      example:
+        type: success
+        status: 200
+        data:
+          session_exists: true
+          session:
+            session_id: abc12345-6789-abcd-ef01-23456789abcd
+            bet_amount: '100'
+            currency: TRY
+            level: 3
+            status: playing
+            profit: '20'
+            coefficient: '1.20'
+            tiles_clicked:
+            - 5
+            - 12
+            cells:
+            - 0
+            - 0
+            - 1
+            - 0
+            - 0
+            - 0
+            - 0
+            - 1
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 1
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 1
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+            - 0
+    DragonTowerTrapRequest:
+      type: object
+      description: Request schema for Dragon Tower trap (select tile) action
+      required:
+      - session_id
+      - tile_index
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: abc12345-6789-abcd-ef01-23456789abcd
+          description: Active session ID
+        tile_index:
+          type: integer
+          description: Index of the tile to select (0–35 for a 6×6 grid)
+          example: 17
+    DragonTowerTrapResponse:
+      type: object
+      description: Response schema after clicking a tile in Dragon Tower
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Updated game state
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: click
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: win
+            bet_amount:
+              type: string
+            profit:
+              type: string
+            coefficient:
+              type: string
+            level:
+              type: integer
+            tile_index:
+              type: integer
+            tiles_clicked:
+              type: array
+              items:
+                type: integer
+            cells:
+              type: array
+              items:
+                type: integer
+              description: Full grid state (6×6, values 0 or 1), present if the game
+                ended or action=result
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: abc12345-6789-abcd-ef01-23456789abcd
+          action: click
+          result: win
+          bet_amount: '100'
+          profit: '20'
+          coefficient: '1.20'
+          level: 3
+          tile_index: 17
+          tiles_clicked:
+          - 5
+          - 12
+          - 17
+          cells:
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+    DragonTowerPlayRequest:
+      type: object
+      description: Request schema for Dragon Tower play (continue/cashout) action
+      required:
+      - session_id
+      - tile_index
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: abc12345-6789-abcd-ef01-23456789abcd
+          description: Active session ID
+        tile_index:
+          type: integer
+          description: Index of the tile to select (0–35 for a 6×6 grid)
+          example: 22
+    DragonTowerPlayResponse:
+      type: object
+      description: Response schema after a Dragon Tower play action
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Result details
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: result
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: loss
+            bet_amount:
+              type: string
+            profit:
+              type: string
+            coefficient:
+              type: string
+            level:
+              type: integer
+            tile_index:
+              type: integer
+            tiles_clicked:
+              type: array
+              items:
+                type: integer
+            cells:
+              type: array
+              items:
+                type: integer
+              description: Full grid state (6×6, values 0 or 1), present on loss or
+                action=result
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: abc12345-6789-abcd-ef01-23456789abcd
+          action: result
+          result: loss
+          bet_amount: '100'
+          profit: '0'
+          coefficient: '1.00'
+          level: 3
+          tile_index: 22
+          tiles_clicked:
+          - 5
+          - 12
+          - 17
+          - 22
+          cells:
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+    DragonTowerCashoutRequest:
+      type: object
+      description: Request schema for Dragon Tower cashout (end session) action
+      required:
+      - session_id
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: abc12345-6789-abcd-ef01-23456789abcd
+          description: Active session ID
+    DragonTowerCashoutSuccessResponse:
+      allOf:
+      - $ref: '#/components/schemas/SuccessBase'
+      - type: object
+        properties:
+          data:
+            type: object
+            properties:
+              action:
+                type: string
+                example: cashout
+              result:
+                type: string
+                enum:
+                - win
+                - loss
+                example: win
+              bet_amount:
+                type: string
+                example: '100'
+              profit:
+                type: string
+                example: '20'
+              coefficient:
+                type: string
+                example: '1.20'
+      description: Successful Dragon Tower cashout response
+    DragonTowerAutoPlayRequest:
+      type: object
+      description: Request schema for Dragon Tower autoplay (multiple tile clicks)
+      required:
+      - session_id
+      - tile_indexes
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: abc12345-6789-abcd-ef01-23456789abcd
+          description: Active session ID
+        tile_indexes:
+          type: array
+          items:
+            type: integer
+          description: Array of tile indices to click automatically (0–35 each)
+          example:
+          - 5
+          - 12
+          - 17
+          - 22
+    DragonTowerAutoPlayResponse:
+      type: object
+      description: Response schema for Dragon Tower autoplay
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: autoplay
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: loss
+            bet_amount:
+              type: string
+            profit:
+              type: string
+            coefficient:
+              type: string
+            tiles_clicked:
+              type: array
+              items:
+                type: integer
+            cells:
+              type: array
+              items:
+                type: integer
+              description: Full grid state (6×6, values 0 or 1), if game ended
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: abc12345-6789-abcd-ef01-23456789abcd
+          action: autoplay
+          result: loss
+          bet_amount: '100'
+          profit: '0'
+          coefficient: '1.00'
+          tiles_clicked:
+          - 5
+          - 12
+          - 17
+          - 22
+          cells:
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 1
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+          - 0
+    HealthCheckCoinFlipResponse:
+      type: object
+      description: Response schema for CoinFlip health check endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+          description: Fixed value "success"
+        status:
+          type: integer
+          example: 200
+          description: HTTP status code
+        message:
+          type: string
+          example: CoinFlip API is up and running.
+          description: Informational message
+    CoinFlipSessionRequest:
+      type: object
+      description: Request schema to create a new CoinFlip session
+      required:
+      - bet_amount
+      - currency
+      properties:
+        bet_amount:
+          type: string
+          description: Bet amount as a numeric string (e.g., "50")
+          example: '50'
+        currency:
+          type: string
+          description: Currency code (3-letter ISO, e.g., "USD")
+          example: USD
+    CoinFlipSessionResponse:
+      type: object
+      description: Successful response for CoinFlip session creation
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Session details
+          properties:
+            session_id:
+              type: string
+              format: uuid
+              example: cafe1234-abcd-5678-ef00-123456abcdef
+              description: Unique session identifier
+            bet_amount:
+              type: string
+              example: '50'
+              description: Bet amount (echoed back)
+            currency:
+              type: string
+              example: USD
+              description: Currency (echoed back)
+            status:
+              type: string
+              example: playing
+              description: Initial session status
+    CoinFlipLoadResponse:
+      type: object
+      description: Response for loading an existing CoinFlip session
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Session existence and details
+          properties:
+            session_exists:
+              type: boolean
+              description: Indicates if there is an active session
+              example: true
+            session:
+              type: object
+              nullable: true
+              description: Session details if an active session exists
+              properties:
+                session_id:
+                  type: string
+                  format: uuid
+                bet_amount:
+                  type: string
+                currency:
+                  type: string
+                status:
+                  type: string
+                profit:
+                  type: string
+                  description: Current profit (numeric string)
+      example:
+        type: success
+        status: 200
+        data:
+          session_exists: true
+          session:
+            session_id: cafe1234-abcd-5678-ef00-123456abcdef
+            bet_amount: '50'
+            currency: USD
+            status: playing
+            profit: '0'
+    CoinFlipTrapRequest:
+      type: object
+      description: Request to execute trap action in CoinFlip
+      required:
+      - session_id
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: cafe1234-abcd-5678-ef00-123456abcdef
+          description: Active session ID
+    CoinFlipTrapResponse:
+      type: object
+      description: Response schema for CoinFlip trap endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Details of the trap outcome
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: trap
+              description: Operation type
+            profit:
+              type: string
+              example: '10.00'
+              description: Profit so far as numeric string
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: cafe1234-abcd-5678-ef00-123456abcdef
+          action: trap
+          profit: '10.00'
+    CoinFlipPlayRequest:
+      type: object
+      description: Request to play (flip) in the CoinFlip session
+      required:
+      - session_id
+      - choice
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: cafe1234-abcd-5678-ef00-123456abcdef
+        choice:
+          type: string
+          enum:
+          - heads
+          - tails
+          example: heads
+          description: Your choice as “heads” or “tails”
+    CoinFlipPlayResponse:
+      type: object
+      description: Response schema for CoinFlip play endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Details of the flip outcome
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: flip
+              description: Transaction type
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: win
+              description: Flip result
+            profit:
+              type: string
+              example: '50.00'
+              description: Profit of this flip (numeric string)
+            balance:
+              type: string
+              example: '150.00'
+              description: Your total balance, e.g. added to/subtracted from the initial bet
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: cafe1234-abcd-5678-ef00-123456abcdef
+          action: flip
+          result: win
+          profit: '50.00'
+          balance: '150.00'
+    CoinFlipCashoutRequest:
+      type: object
+      description: Request to end session or perform cashout in CoinFlip
+      required:
+      - session_id
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: cafe1234-abcd-5678-ef00-123456abcdef
+          description: Active session ID
+    CoinFlipCashoutResponse:
+      type: object
+      description: Response schema for CoinFlip cashout endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Cashout result details
+          properties:
+            action:
+              type: string
+              example: cashout
+            result:
+              type: string
+              enum:
+              - win
+              - loss
+              example: win
+            total_profit:
+              type: string
+              example: '75.00'
+              description: Total profit up to that moment
+      example:
+        type: success
+        status: 200
+        data:
+          action: cashout
+          result: win
+          total_profit: '75.00'
+    CoinFlipAutoPlayRequest:
+      type: object
+      description: Request to perform automatic play (multiple flips) operation
+      required:
+      - session_id
+      - choices
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          example: cafe1234-abcd-5678-ef00-123456abcdef
+          description: Active session ID
+        choices:
+          type: array
+          description: Array of Heads/Tails preferences (e.g., ["heads","tails","heads"])
+          items:
+            type: string
+            enum:
+            - heads
+            - tails
+          example:
+          - heads
+          - tails
+          - heads
+    CoinFlipAutoPlayResponse:
+      type: object
+      description: Response schema for CoinFlip autoplay endpoint
+      properties:
+        type:
+          type: string
+          enum:
+          - success
+          example: success
+        status:
+          type: integer
+          example: 200
+        data:
+          type: object
+          description: Autoplay result details
+          properties:
+            session_id:
+              type: string
+              format: uuid
+            action:
+              type: string
+              example: autoplay
+            results:
+              type: array
+              description: Result of each flip and profit information
+              items:
+                type: object
+                properties:
+                  choice:
+                    type: string
+                    enum:
+                    - heads
+                    - tails
+                  result:
+                    type: string
+                    enum:
+                    - win
+                    - loss
+                  profit:
+                    type: string
+                    description: Profit of that flip
+              example:
+              - choice: heads
+                result: win
+                profit: '50.00'
+              - choice: tails
+                result: loss
+                profit: '-50.00'
+              - choice: heads
+                result: win
+                profit: '50.00'
+            total_profit:
+              type: string
+              example: '50.00'
+              description: Total profit at the end of Autoplay
+      example:
+        type: success
+        status: 200
+        data:
+          session_id: cafe1234-abcd-5678-ef00-123456abcdef
+          action: autoplay
+          results:
+          - choice: heads
+            result: win
+            profit: '50.00'
+          - choice: tails
+            result: loss
+            profit: '-50.00'
+          - choice: heads
+            result: win
+            profit: '50.00'
+          total_profit: '50.00'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+- bearerAuth: []
